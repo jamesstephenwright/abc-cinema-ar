@@ -38,8 +38,6 @@
         padding: 10px;
       }
 
-      /* Active State - Kept yellow for high contrast button visibility, 
-         but you can change #FFFF00 to white if you want them to match the text */
       .icon-btn.active {
         background: #FFFF00; 
         border-color: black;
@@ -64,10 +62,7 @@
         width: 85%;
         height: 150px; 
         background-color: rgba(0, 0, 0, 0.85);
-        
-        /* UPDATED: Border is now White */
         border: 2px solid #FFFFFF; 
-        
         border-radius: 10px;
         overflow: hidden; 
         display: none;
@@ -76,10 +71,7 @@
 
       #caption-content {
         padding: 20px;
-        
-        /* UPDATED: Text is now White */
         color: #FFFFFF; 
-        
         font-family: Arial, sans-serif;
         font-size: 1.4rem;
         line-height: 1.6;
@@ -141,39 +133,68 @@
       const captionContent = document.getElementById('caption-content');
       const audioEl = document.getElementById('audio-desc');
 
-      // Audio Logic
-      btnAudio.addEventListener('click', () => {
-        btnAudio.classList.toggle('active');
-        if (audioEl.paused) {
-          audioEl.play();
-        } else {
-          audioEl.pause();
-          audioEl.currentTime = 0;
-        }
-      });
-
-      // --- SCROLLING LOGIC ---
+      // --- SETTINGS ---
+      // Reduced from 0.4 to 0.25 (slower by approx 1/3)
+      let scrollSpeed = 0.25; 
+      
       let scrollInterval;
       let currentTop = 0;
       let isPaused = false;
-      let scrollSpeed = 0.4;
-      
       let touchStartY = 0;
       let isTouching = false;
 
-      // 1. Toggle Button
+      // --- HELPER: RESET & SYNC ---
+      function resetSync() {
+        // Reset Audio
+        audioEl.currentTime = 0;
+        // Reset Text Scroll
+        currentTop = 0;
+        captionContent.style.top = '0px';
+      }
+
+      // --- 1. CAPTION BUTTON LOGIC ---
       btnCaptions.addEventListener('click', () => {
         btnCaptions.classList.toggle('active');
+        
         if (captionContainer.style.display === 'block') {
+          // Turning OFF
           stopScrolling();
           captionContainer.style.display = 'none';
         } else {
+          // Turning ON
           captionContainer.style.display = 'block';
+          
+          // SYNC CHECK: If Audio is already active, restart both
+          if (btnAudio.classList.contains('active')) {
+            resetSync();
+            audioEl.play(); // Ensure audio plays from 0
+          }
+          
           startScrolling();
         }
       });
 
-      // 2. Auto-Scroll
+      // --- 2. AUDIO BUTTON LOGIC ---
+      btnAudio.addEventListener('click', () => {
+        btnAudio.classList.toggle('active');
+        
+        if (audioEl.paused) {
+          // Turning ON
+          
+          // SYNC CHECK: If Captions are already active, restart both
+          if (btnCaptions.classList.contains('active')) {
+            resetSync();
+          }
+          
+          audioEl.play();
+        } else {
+          // Turning OFF
+          audioEl.pause();
+          // We don't reset currentTime here so they can resume if they want
+        }
+      });
+
+      // --- SCROLLING ANIMATION ---
       function startScrolling() {
         if (scrollInterval) cancelAnimationFrame(scrollInterval);
         
@@ -196,7 +217,7 @@
         cancelAnimationFrame(scrollInterval);
       }
 
-      // 3. Vertical Swipe Interactions
+      // --- TOUCH INTERACTIONS ---
       captionContainer.addEventListener('touchstart', (e) => {
         isPaused = true; 
         touchStartY = e.touches[0].clientY;
