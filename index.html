@@ -38,8 +38,10 @@
         padding: 10px;
       }
 
+      /* Active State - Kept yellow for high contrast button visibility, 
+         but you can change #FFFF00 to white if you want them to match the text */
       .icon-btn.active {
-        background: #FFFF00; /* High Vis Yellow */
+        background: #FFFF00; 
         border-color: black;
         transform: scale(1.1);
       }
@@ -56,13 +58,16 @@
       /* --- TELEPROMPTER STYLES --- */
       #caption-container {
         position: absolute;
-        top: 20px; /* MOVED TO TOP */
+        top: 20px; 
         left: 50%;
         transform: translateX(-50%);
         width: 85%;
         height: 150px; 
         background-color: rgba(0, 0, 0, 0.85);
-        border: 2px solid #FFFF00;
+        
+        /* UPDATED: Border is now White */
+        border: 2px solid #FFFFFF; 
+        
         border-radius: 10px;
         overflow: hidden; 
         display: none;
@@ -71,7 +76,10 @@
 
       #caption-content {
         padding: 20px;
-        color: #FFFF00;
+        
+        /* UPDATED: Text is now White */
+        color: #FFFFFF; 
+        
         font-family: Arial, sans-serif;
         font-size: 1.4rem;
         line-height: 1.6;
@@ -93,18 +101,14 @@
   </head>
   <body>
 
-    <audio id="audio-desc" src="./assets/lorem_ipsum.mp3"></audio>
+    <audio id="audio-desc" src="./assets/audio_description.mp3"></audio>
 
     <div id="caption-container">
       <div id="caption-content">
         You are standing on a paved street corner looking at a large, vibrant mural painted on the construction hoardings of the ABC Cinema.
-
-Above the artwork, a dark panel runs the length of the building, featuring the word SAVOY in elegant, gold Art Deco lettering, flanked by geometric fan motifs that shimmer in the light.
-
-The mural below transports us to a stylized 1930s scene. On the far left, a fashionable couple strolls past; the woman wears a floor length teal dress with yellow flowers and a cloche hat, walking a sleek white greyhound dog. Beside her, a man in a sharp dark suit and fedora looks on. Above them, a vintage biplane soars through a sky of teal and blue curves.
-
-Moving to the centre, a classic maroon saloon car with white walled tyres sits parked in the foreground. Behind it rises a stylized cityscape of jagged skyscrapers in bold shades of orange, lime green, and gold. To the right of the car, other figures in period dress, men in tuxedos and women in flapper style coats, mingle against the backdrop of this nostalgic Jazz Age city.
-        
+        Above the artwork, a dark panel runs the length of the building, featuring the word SAVOY in elegant, gold Art Deco lettering.
+        The mural below transports us to a stylized 1930s scene. On the far left, a fashionable couple strolls past; the woman wears a floor length teal dress with yellow flowers.
+        Moving to the centre, a classic maroon saloon car with white walled tyres sits parked in the foreground.
       </div>
       <div id="scroll-hint">Hold to Pause • Swipe Up/Down to Scroll</div>
     </div>
@@ -154,8 +158,7 @@ Moving to the centre, a classic maroon saloon car with white walled tyres sits p
       let isPaused = false;
       let scrollSpeed = 0.4;
       
-      // Touch Variables
-      let touchStartY = 0; // Changed to Y
+      let touchStartY = 0;
       let isTouching = false;
 
       // 1. Toggle Button
@@ -176,9 +179,8 @@ Moving to the centre, a classic maroon saloon car with white walled tyres sits p
         
         function animate() {
           if (!isPaused && captionContainer.style.display === 'block') {
-            currentTop -= scrollSpeed; // Automatically moves up
+            currentTop -= scrollSpeed;
             
-            // Limit Bounds
             const maxScroll = -(captionContent.clientHeight - captionContainer.clientHeight);
             if (currentTop < maxScroll) currentTop = maxScroll; 
             if (currentTop > 0) currentTop = 0;
@@ -197,7 +199,7 @@ Moving to the centre, a classic maroon saloon car with white walled tyres sits p
       // 3. Vertical Swipe Interactions
       captionContainer.addEventListener('touchstart', (e) => {
         isPaused = true; 
-        touchStartY = e.touches[0].clientY; // Capture Vertical Start
+        touchStartY = e.touches[0].clientY;
         isTouching = true;
       });
 
@@ -210,17 +212,12 @@ Moving to the centre, a classic maroon saloon car with white walled tyres sits p
         if (!isTouching) return;
         e.preventDefault(); 
         
-        const touchCurrentY = e.touches[0].clientY; // Capture Vertical Current
-        const diffY = touchCurrentY - touchStartY;  // Calculate vertical difference
+        const touchCurrentY = e.touches[0].clientY;
+        const diffY = touchCurrentY - touchStartY;
 
-        // LOGIC:
-        // Drag Down (Positive diffY) -> Add to Top -> Text moves Down (Rewind)
-        // Drag Up (Negative diffY) -> Subtract from Top -> Text moves Up (Forward)
-        
         const sensitivity = 2.0; 
         currentTop += (diffY * 0.05) * sensitivity;
 
-        // Apply visual update immediately
         captionContent.style.top = currentTop + 'px';
       });
 
