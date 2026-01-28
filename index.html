@@ -1,80 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC Cinema AR - Accessibility Mode</title>
+    
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-    
+
     <style>
-      /* Style for the Unmute Button */
-      #mute-btn {
+      /* --- ACCESSIBILITY UI STYLES --- */
+      
+      /* Main Container for Buttons */
+      #ui-container {
         position: absolute;
-        bottom: 30px;
+        bottom: 20px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        z-index: 1000; /* On top of AR */
+        pointer-events: auto;
+      }
+
+      /* The Buttons */
+      .access-btn {
+        background-color: #000000; /* High Contrast Black */
+        color: #FFFF00; /* High Contrast Yellow */
+        border: 3px solid #FFFF00;
+        padding: 15px 25px;
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 10px;
+        cursor: pointer;
+        min-width: 80px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+      }
+
+      /* Active State (When button is ON) */
+      .access-btn.active {
+        background-color: #FFFF00;
+        color: #000000;
+        border-color: #000000;
+      }
+
+      /* Caption Text Box */
+      #caption-box {
+        position: absolute;
+        top: 20%; /* Positioned near top for visibility */
         left: 50%;
         transform: translateX(-50%);
-        z-index: 999; /* Ensures it sits on top of AR */
-        
-        background-color: rgba(0, 0, 0, 0.6);
-        color: white;
-        border: 2px solid white;
-        padding: 10px 20px;
+        width: 80%;
+        background-color: rgba(0, 0, 0, 0.85); /* Dark background for readability */
+        color: #FFFFFF;
+        padding: 20px;
+        border-radius: 10px;
         font-family: Arial, sans-serif;
-        font-size: 16px;
-        border-radius: 30px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      
-      #mute-btn:active {
-        background-color: white;
-        color: black;
+        font-size: 1.2rem;
+        line-height: 1.5;
+        text-align: center;
+        display: none; /* Hidden by default */
+        z-index: 999;
+        border: 2px solid #FFFFFF;
       }
     </style>
   </head>
   <body>
-    
-    <button id="mute-btn">🔊 Unmute</button>
+
+    <audio id="audio-desc" src="./assets/audio_description.mp3"></audio>
+
+    <div id="caption-box" role="region" aria-live="polite">
+      In front of you is the historic ABC Cinema. The facade features Art Deco geometric shapes in teal and gold. To the left, a painted mural shows a jazz band playing, while the central doors are sealed shut, awaiting restoration.
+    </div>
+
+    <div id="ui-container">
+      <button id="btn-captions" class="access-btn" aria-label="Toggle Captions">
+        CC
+      </button>
+
+      <button id="btn-audio" class="access-btn" aria-label="Toggle Audio Description">
+        Audio AD
+      </button>
+    </div>
 
     <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
-      <a-assets>
-        <a-asset-item id="carModel" src="./assets/1938_car.glb"></a-asset-item>
-        
-        <video id="vid" src="./assets/1938_Countdown.mp4" autoplay="true" muted="true" loop="true" playsinline webkit-playsinline crossorigin="anonymous"></video>
-      </a-assets>
-
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      
+      <a-entity mindar-image-target="targetIndex: 0"></a-entity>
 
-      <a-entity mindar-image-target="targetIndex: 0">
-        
-        <a-plane src="#vid" position="0 0 0" height="0.276" width="0.5" rotation="0 0 0" class="clickable"></a-plane>
-        
-        <a-gltf-model rotation="0 0 0" position="0 -0.2 0.1" scale="0.05 0.05 0.05" src="#carModel" animation="property: rotation; to: 0 360 0; dur: 10000; easing: linear; loop: true">
-        </a-gltf-model>
-
-      </a-entity>
     </a-scene>
-    
-    <script>
-      const muteBtn = document.getElementById('mute-btn');
-      const vid = document.getElementById('vid');
 
-      muteBtn.addEventListener('click', () => {
-        if (vid.muted) {
-          // If muted, turn sound ON
-          vid.muted = false;
-          muteBtn.innerText = "🔇 Mute"; // Change text to 'Mute'
-          
-          // Safety check: sometimes video pauses if unmuted without interaction, ensure it plays
-          vid.play();
+    <script>
+      const btnCaptions = document.getElementById('btn-captions');
+      const btnAudio = document.getElementById('btn-audio');
+      const captionBox = document.getElementById('caption-box');
+      const audioEl = document.getElementById('audio-desc');
+
+      // --- CAPTION LOGIC ---
+      btnCaptions.addEventListener('click', () => {
+        // Toggle the 'active' class for visual feedback
+        btnCaptions.classList.toggle('active');
+        
+        // Show/Hide the text box
+        if (captionBox.style.display === 'block') {
+          captionBox.style.display = 'none';
+          btnCaptions.innerText = "CC"; // Reset Label
         } else {
-          // If unmuted, turn sound OFF
-          vid.muted = true;
-          muteBtn.innerText = "🔊 Unmute"; // Change text back
+          captionBox.style.display = 'block';
+          btnCaptions.innerText = "Hide CC"; // Change Label
+        }
+      });
+
+      // --- AUDIO LOGIC ---
+      btnAudio.addEventListener('click', () => {
+        btnAudio.classList.toggle('active');
+
+        if (audioEl.paused) {
+          audioEl.play();
+          btnAudio.innerText = "Stop AD";
+        } else {
+          audioEl.pause();
+          audioEl.currentTime = 0; // Reset to start
+          btnAudio.innerText = "Audio AD";
         }
       });
     </script>
+
   </body>
 </html>
