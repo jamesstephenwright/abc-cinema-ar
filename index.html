@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+  </head>
+  <body>
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <a-asset-item id="carModel" src="./assets/1938_car.glb"></a-asset-item>
+        
+        <video id="vid" src="./assets/1938_Countdown.mp4" loop="true" crossorigin="anonymous"></video>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0">
+        
+        <a-plane src="#vid" position="0 0 0" height="0.552" width="1" rotation="0 0 0" class="clickable"></a-plane>
+        
+        <a-gltf-model rotation="0 0 0" position="0 -0.2 0.1" scale="0.05 0.05 0.05" src="#carModel" animation="property: rotation; to: 0 360 0; dur: 10000; easing: linear; loop: true">
+        </a-gltf-model>
+
+      </a-entity>
+    </a-scene>
+    
+    <script>
+      const scene = document.querySelector('a-scene');
+      const vid = document.querySelector('#vid');
+      scene.addEventListener('arReady', (event) => {
+          // When AR is ready, wait for a tap to play video (iOS restriction)
+          document.body.addEventListener('click', () => {
+            vid.play();
+          });
+      });
+    </script>
+  </body>
+</html>
