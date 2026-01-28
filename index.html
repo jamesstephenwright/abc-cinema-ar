@@ -26,9 +26,9 @@
       #font-controls {
         position: absolute;
         top: 20px;
-        right: 10px;
-        display: none; /* Hidden by default, appears with Captions */
-        flex-direction: column; /* Stack Vertically */
+        right: 15px; /* Fixed 15px from right edge */
+        display: none; 
+        flex-direction: column; 
         gap: 10px;
         z-index: 1001;
       }
@@ -48,7 +48,6 @@
         padding: 10px;
       }
 
-      /* Active State (Yellow) */
       .icon-btn.active {
         background: #FFFF00; 
         border-color: black;
@@ -64,7 +63,6 @@
         fill: black;
       }
       
-      /* Specific style for Font Buttons (Click effect only) */
       .font-btn:active {
         background: white;
       }
@@ -76,11 +74,14 @@
       #caption-container {
         position: absolute;
         top: 20px; 
-        left: 50%; /* Center of screen */
-        transform: translateX(-50%); /* Center alignment fix */
         
-        /* Adjusted width to leave room for buttons on the right */
-        width: 75%; 
+        /* UPDATED LAYOUT: Stretch between Left and Right */
+        left: 20px; 
+        right: 85px; /* Leaves 85px of space on the right for buttons */
+        
+        /* Removed fixed width and centering transform */
+        /* width: 75%; */
+        /* transform: translateX(-50%); */
         
         height: 150px; 
         background-color: rgba(0, 0, 0, 0.85);
@@ -163,7 +164,6 @@
       const btnCaptions = document.getElementById('btn-captions');
       const btnAudio = document.getElementById('btn-audio');
       
-      // Font Elements
       const fontControls = document.getElementById('font-controls');
       const btnFontUp = document.getElementById('btn-font-up');
       const btnFontDown = document.getElementById('btn-font-down');
@@ -213,14 +213,12 @@
         btnCaptions.classList.toggle('active');
         
         if (captionContainer.style.display === 'block') {
-          // Turn OFF
           stopScrolling();
           captionContainer.style.display = 'none';
-          fontControls.style.display = 'none'; // Hide font buttons
+          fontControls.style.display = 'none';
         } else {
-          // Turn ON
           captionContainer.style.display = 'block';
-          fontControls.style.display = 'flex'; // Show font buttons
+          fontControls.style.display = 'flex';
           
           if (btnAudio.classList.contains('active')) {
             resetSync();
