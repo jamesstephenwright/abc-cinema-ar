@@ -4,21 +4,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+    
+    <style>
+      /* Style for the Unmute Button */
+      #mute-btn {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999; /* Ensures it sits on top of AR */
+        
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        border: 2px solid white;
+        padding: 10px 20px;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        border-radius: 30px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      #mute-btn:active {
+        background-color: white;
+        color: black;
+      }
+    </style>
   </head>
   <body>
+    
+    <button id="mute-btn">🔊 Unmute</button>
+
     <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
         <a-asset-item id="carModel" src="./assets/1938_car.glb"></a-asset-item>
         
-        <video id="vid" src="./assets/1938_Countdown.mp4" loop="true" crossorigin="anonymous"></video>
+        <video id="vid" src="./assets/1938_Countdown.mp4" autoplay="true" muted="true" loop="true" playsinline webkit-playsinline crossorigin="anonymous"></video>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
         
-        <a-plane src="#vid" position="0 0 0" height="0.552" width="1" rotation="0 0 0" class="clickable"></a-plane>
+        <a-plane src="#vid" position="0 0 0" height="0.276" width="0.5" rotation="0 0 0" class="clickable"></a-plane>
         
         <a-gltf-model rotation="0 0 0" position="0 -0.2 0.1" scale="0.05 0.05 0.05" src="#carModel" animation="property: rotation; to: 0 360 0; dur: 10000; easing: linear; loop: true">
         </a-gltf-model>
@@ -27,13 +58,22 @@
     </a-scene>
     
     <script>
-      const scene = document.querySelector('a-scene');
-      const vid = document.querySelector('#vid');
-      scene.addEventListener('arReady', (event) => {
-          // When AR is ready, wait for a tap to play video (iOS restriction)
-          document.body.addEventListener('click', () => {
-            vid.play();
-          });
+      const muteBtn = document.getElementById('mute-btn');
+      const vid = document.getElementById('vid');
+
+      muteBtn.addEventListener('click', () => {
+        if (vid.muted) {
+          // If muted, turn sound ON
+          vid.muted = false;
+          muteBtn.innerText = "🔇 Mute"; // Change text to 'Mute'
+          
+          // Safety check: sometimes video pauses if unmuted without interaction, ensure it plays
+          vid.play();
+        } else {
+          // If unmuted, turn sound OFF
+          vid.muted = true;
+          muteBtn.innerText = "🔊 Unmute"; // Change text back
+        }
       });
     </script>
   </body>
