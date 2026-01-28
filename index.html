@@ -44,7 +44,6 @@
         transform: scale(1.1);
       }
 
-      /* SVG Fill Colors */
       .icon-btn svg {
         fill: white;
         width: 100%;
@@ -57,15 +56,15 @@
       /* --- TELEPROMPTER STYLES --- */
       #caption-container {
         position: absolute;
-        top: 15%; 
+        top: 20px; /* MOVED TO TOP */
         left: 50%;
         transform: translateX(-50%);
         width: 85%;
-        height: 150px; /* Visible window height */
+        height: 150px; 
         background-color: rgba(0, 0, 0, 0.85);
         border: 2px solid #FFFF00;
         border-radius: 10px;
-        overflow: hidden; /* Hides the scrolling text outside the box */
+        overflow: hidden; 
         display: none;
         z-index: 999;
       }
@@ -82,7 +81,6 @@
         top: 0;
       }
       
-      /* Visual cue for scrolling */
       #scroll-hint {
         position: absolute;
         bottom: 5px;
@@ -103,9 +101,9 @@
         Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
         Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
         Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        (Swipe Right to Rewind, Hold to Pause)
+        (Swipe Down to Rewind, Swipe Up to Forward)
       </div>
-      <div id="scroll-hint">Hold to Pause • Swipe &lt; &gt; to Scroll</div>
+      <div id="scroll-hint">Hold to Pause • Swipe Up/Down to Scroll</div>
     </div>
 
     <div id="ui-container">
@@ -130,7 +128,6 @@
     </a-scene>
 
     <script>
-      // Elements
       const btnCaptions = document.getElementById('btn-captions');
       const btnAudio = document.getElementById('btn-audio');
       const captionContainer = document.getElementById('caption-container');
@@ -152,10 +149,10 @@
       let scrollInterval;
       let currentTop = 0;
       let isPaused = false;
-      let scrollSpeed = 0.4; // Pixels per tick
+      let scrollSpeed = 0.4;
       
-      // Touch Handling Variables
-      let touchStartX = 0;
+      // Touch Variables
+      let touchStartY = 0; // Changed to Y
       let isTouching = false;
 
       // 1. Toggle Button
@@ -170,16 +167,15 @@
         }
       });
 
-      // 2. The Auto-Scroll Loop
+      // 2. Auto-Scroll
       function startScrolling() {
         if (scrollInterval) cancelAnimationFrame(scrollInterval);
         
         function animate() {
           if (!isPaused && captionContainer.style.display === 'block') {
-            // Move text up
-            currentTop -= scrollSpeed;
+            currentTop -= scrollSpeed; // Automatically moves up
             
-            // Limit: Don't scroll past the end
+            // Limit Bounds
             const maxScroll = -(captionContent.clientHeight - captionContainer.clientHeight);
             if (currentTop < maxScroll) currentTop = maxScroll; 
             if (currentTop > 0) currentTop = 0;
@@ -195,28 +191,33 @@
         cancelAnimationFrame(scrollInterval);
       }
 
-      // 3. Touch Interactions
+      // 3. Vertical Swipe Interactions
       captionContainer.addEventListener('touchstart', (e) => {
-        isPaused = true; // Pause on hold
-        touchStartX = e.touches[0].clientX;
+        isPaused = true; 
+        touchStartY = e.touches[0].clientY; // Capture Vertical Start
         isTouching = true;
       });
 
       captionContainer.addEventListener('touchend', () => {
-        isPaused = false; // Resume on release
+        isPaused = false;
         isTouching = false;
       });
 
       captionContainer.addEventListener('touchmove', (e) => {
         if (!isTouching) return;
-        e.preventDefault(); // Stop whole page moving
+        e.preventDefault(); 
         
-        const touchCurrentX = e.touches[0].clientX;
-        const diffX = touchCurrentX - touchStartX;
+        const touchCurrentY = e.touches[0].clientY; // Capture Vertical Current
+        const diffY = touchCurrentY - touchStartY;  // Calculate vertical difference
 
+        // LOGIC:
+        // Drag Down (Positive diffY) -> Add to Top -> Text moves Down (Rewind)
+        // Drag Up (Negative diffY) -> Subtract from Top -> Text moves Up (Forward)
+        
         const sensitivity = 2.0; 
-        currentTop += (diffX * 0.05) * sensitivity;
+        currentTop += (diffY * 0.05) * sensitivity;
 
+        // Apply visual update immediately
         captionContent.style.top = currentTop + 'px';
       });
 
