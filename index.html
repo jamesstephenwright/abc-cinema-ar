@@ -9,9 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
     <style>
-      /* --- ACCESSIBILITY UI STYLES --- */
+      /* --- ACCESSIBILITY ICONS & UI --- */
       
-      /* Main Container for Buttons */
       #ui-container {
         position: absolute;
         bottom: 20px;
@@ -19,115 +18,208 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        gap: 20px;
-        z-index: 1000; /* On top of AR */
+        gap: 30px;
+        z-index: 1000;
         pointer-events: auto;
       }
 
-      /* The Buttons */
-      .access-btn {
-        background-color: #000000; /* High Contrast Black */
-        color: #FFFF00; /* High Contrast Yellow */
-        border: 3px solid #FFFF00;
-        padding: 15px 25px;
-        font-family: Arial, sans-serif;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 10px;
+      /* Button Styles */
+      .icon-btn {
+        background: rgba(0, 0, 0, 0.7);
+        border: 2px solid white;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
         cursor: pointer;
-        min-width: 80px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        padding: 10px;
       }
 
-      /* Active State (When button is ON) */
-      .access-btn.active {
-        background-color: #FFFF00;
-        color: #000000;
-        border-color: #000000;
+      .icon-btn.active {
+        background: #FFFF00; /* High Vis Yellow */
+        border-color: black;
+        transform: scale(1.1);
       }
 
-      /* Caption Text Box */
-      #caption-box {
+      /* SVG Fill Colors */
+      .icon-btn svg {
+        fill: white;
+        width: 100%;
+        height: 100%;
+      }
+      .icon-btn.active svg {
+        fill: black;
+      }
+
+      /* --- TELEPROMPTER STYLES --- */
+      #caption-container {
         position: absolute;
-        top: 20%; /* Positioned near top for visibility */
+        top: 15%; 
         left: 50%;
         transform: translateX(-50%);
-        width: 80%;
-        background-color: rgba(0, 0, 0, 0.85); /* Dark background for readability */
-        color: #FFFFFF;
-        padding: 20px;
+        width: 85%;
+        height: 150px; /* Visible window height */
+        background-color: rgba(0, 0, 0, 0.85);
+        border: 2px solid #FFFF00;
         border-radius: 10px;
-        font-family: Arial, sans-serif;
-        font-size: 1.2rem;
-        line-height: 1.5;
-        text-align: center;
-        display: none; /* Hidden by default */
+        overflow: hidden; /* Hides the scrolling text outside the box */
+        display: none;
         z-index: 999;
-        border: 2px solid #FFFFFF;
+      }
+
+      #caption-content {
+        padding: 20px;
+        color: #FFFF00;
+        font-family: Arial, sans-serif;
+        font-size: 1.4rem;
+        line-height: 1.6;
+        font-weight: bold;
+        text-align: left;
+        position: relative;
+        top: 0;
+      }
+      
+      /* Visual cue for scrolling */
+      #scroll-hint {
+        position: absolute;
+        bottom: 5px;
+        right: 10px;
+        font-size: 10px;
+        color: #aaa;
+        pointer-events: none;
       }
     </style>
   </head>
   <body>
 
-    <audio id="audio-desc" src="./assets/audio_description.mp3"></audio>
+    <audio id="audio-desc" src="./assets/lorem_ipsum.mp3"></audio>
 
-    <div id="caption-box" role="region" aria-live="polite">
-      In front of you is the historic ABC Cinema. The facade features Art Deco geometric shapes in teal and gold. To the left, a painted mural shows a jazz band playing, while the central doors are sealed shut, awaiting restoration.
+    <div id="caption-container">
+      <div id="caption-content">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        (Swipe Right to Rewind, Hold to Pause)
+      </div>
+      <div id="scroll-hint">Hold to Pause • Swipe &lt; &gt; to Scroll</div>
     </div>
 
     <div id="ui-container">
-      <button id="btn-captions" class="access-btn" aria-label="Toggle Captions">
-        CC
+      
+      <button id="btn-captions" class="icon-btn" aria-label="Toggle Captions">
+        <svg viewBox="0 0 24 24">
+           <path d="M19 4H5C3.89 4 3 4.9 3 6V18C3 19.1 3.89 20 5 20H19C20.1 20 21 19.1 21 18V6C21 4.9 20.1 4 19 4M11 11H9.5V10.5H8.5V13.5H9.5V13H11V14.5C11 15.33 10.33 16 9.5 16H8C7.17 16 6.5 15.33 6.5 14.5V9.5C6.5 8.67 7.17 8 8 8H9.5C10.33 8 11 8.67 11 9.5V11M17.5 11H16V10.5H15V13.5H16V13H17.5V14.5C17.5 15.33 16.83 16 16 16H14.5C13.67 16 13 15.33 13 14.5V9.5C13 8.67 13.67 8 14.5 8H16C16.83 8 17.5 8.67 17.5 9.5V11Z" />
+        </svg>
       </button>
 
-      <button id="btn-audio" class="access-btn" aria-label="Toggle Audio Description">
-        Audio AD
+      <button id="btn-audio" class="icon-btn" aria-label="Toggle Audio Description">
+        <svg viewBox="0 0 24 24">
+           <path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M4.5,10.5V8.5H6.5V10.5H4.5M4.5,15.5V13.5H6.5V15.5H4.5M15,14A1,1 0 0,1 14,15H10A1,1 0 0,1 9,14V10A1,1 0 0,1 10,9H14A1,1 0 0,1 15,10V14M17.5,15.5V13.5H19.5V15.5H17.5M17.5,10.5V8.5H19.5V10.5H17.5M13.5,13.5H10.5V10.5H13.5V13.5Z" />
+        </svg>
       </button>
+
     </div>
 
     <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-      
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-      
       <a-entity mindar-image-target="targetIndex: 0"></a-entity>
-
     </a-scene>
 
     <script>
+      // Elements
       const btnCaptions = document.getElementById('btn-captions');
       const btnAudio = document.getElementById('btn-audio');
-      const captionBox = document.getElementById('caption-box');
+      const captionContainer = document.getElementById('caption-container');
+      const captionContent = document.getElementById('caption-content');
       const audioEl = document.getElementById('audio-desc');
 
-      // --- CAPTION LOGIC ---
-      btnCaptions.addEventListener('click', () => {
-        // Toggle the 'active' class for visual feedback
-        btnCaptions.classList.toggle('active');
-        
-        // Show/Hide the text box
-        if (captionBox.style.display === 'block') {
-          captionBox.style.display = 'none';
-          btnCaptions.innerText = "CC"; // Reset Label
-        } else {
-          captionBox.style.display = 'block';
-          btnCaptions.innerText = "Hide CC"; // Change Label
-        }
-      });
-
-      // --- AUDIO LOGIC ---
+      // Audio Logic
       btnAudio.addEventListener('click', () => {
         btnAudio.classList.toggle('active');
-
         if (audioEl.paused) {
           audioEl.play();
-          btnAudio.innerText = "Stop AD";
         } else {
           audioEl.pause();
-          audioEl.currentTime = 0; // Reset to start
-          btnAudio.innerText = "Audio AD";
+          audioEl.currentTime = 0;
         }
       });
-    </script>
 
+      // --- SCROLLING LOGIC ---
+      let scrollInterval;
+      let currentTop = 0;
+      let isPaused = false;
+      let scrollSpeed = 0.4; // Pixels per tick
+      
+      // Touch Handling Variables
+      let touchStartX = 0;
+      let isTouching = false;
+
+      // 1. Toggle Button
+      btnCaptions.addEventListener('click', () => {
+        btnCaptions.classList.toggle('active');
+        if (captionContainer.style.display === 'block') {
+          stopScrolling();
+          captionContainer.style.display = 'none';
+        } else {
+          captionContainer.style.display = 'block';
+          startScrolling();
+        }
+      });
+
+      // 2. The Auto-Scroll Loop
+      function startScrolling() {
+        if (scrollInterval) cancelAnimationFrame(scrollInterval);
+        
+        function animate() {
+          if (!isPaused && captionContainer.style.display === 'block') {
+            // Move text up
+            currentTop -= scrollSpeed;
+            
+            // Limit: Don't scroll past the end
+            const maxScroll = -(captionContent.clientHeight - captionContainer.clientHeight);
+            if (currentTop < maxScroll) currentTop = maxScroll; 
+            if (currentTop > 0) currentTop = 0;
+
+            captionContent.style.top = currentTop + 'px';
+          }
+          scrollInterval = requestAnimationFrame(animate);
+        }
+        animate();
+      }
+
+      function stopScrolling() {
+        cancelAnimationFrame(scrollInterval);
+      }
+
+      // 3. Touch Interactions
+      captionContainer.addEventListener('touchstart', (e) => {
+        isPaused = true; // Pause on hold
+        touchStartX = e.touches[0].clientX;
+        isTouching = true;
+      });
+
+      captionContainer.addEventListener('touchend', () => {
+        isPaused = false; // Resume on release
+        isTouching = false;
+      });
+
+      captionContainer.addEventListener('touchmove', (e) => {
+        if (!isTouching) return;
+        e.preventDefault(); // Stop whole page moving
+        
+        const touchCurrentX = e.touches[0].clientX;
+        const diffX = touchCurrentX - touchStartX;
+
+        const sensitivity = 2.0; 
+        currentTop += (diffX * 0.05) * sensitivity;
+
+        captionContent.style.top = currentTop + 'px';
+      });
+
+    </script>
   </body>
 </html>
