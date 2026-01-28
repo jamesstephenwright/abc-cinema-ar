@@ -25,12 +25,27 @@
       /* --- TOP RIGHT UI (FONT CONTROLS) --- */
       #font-controls {
         position: absolute;
+        
+        /* VERTICAL ALIGNMENT FIX: */
+        /* Match the Top and Height of the Caption Box exactly */
         top: 20px;
-        right: 15px; /* Fixed 15px from right edge */
-        display: none; 
+        height: 150px;
+        
+        right: 15px;
+        
+        /* Use Flexbox to center the buttons vertically within this 150px height */
+        display: none; /* Hidden by default */
         flex-direction: column; 
+        justify-content: center; /* Centers vertically */
         gap: 10px;
+        
         z-index: 1001;
+        pointer-events: none; /* Allows clicks to pass through the empty space around buttons */
+      }
+      
+      /* Re-enable clicks on the buttons themselves */
+      #font-controls button {
+        pointer-events: auto;
       }
 
       /* Shared Button Styles */
@@ -75,13 +90,9 @@
         position: absolute;
         top: 20px; 
         
-        /* UPDATED LAYOUT: Stretch between Left and Right */
+        /* Anchor Left & Right */
         left: 20px; 
-        right: 85px; /* Leaves 85px of space on the right for buttons */
-        
-        /* Removed fixed width and centering transform */
-        /* width: 75%; */
-        /* transform: translateX(-50%); */
+        right: 85px; /* Stop 85px from right to avoid overlap */
         
         height: 150px; 
         background-color: rgba(0, 0, 0, 0.85);
@@ -218,7 +229,7 @@
           fontControls.style.display = 'none';
         } else {
           captionContainer.style.display = 'block';
-          fontControls.style.display = 'flex';
+          fontControls.style.display = 'flex'; // This activates the Flexbox centering
           
           if (btnAudio.classList.contains('active')) {
             resetSync();
