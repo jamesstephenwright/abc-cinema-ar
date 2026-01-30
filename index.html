@@ -5,10 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ABC Cinema AR - Accessibility Mode</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
+
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
     <style>
+      /* --- GLOBAL FONT SETTING --- */
+      body {
+        font-family: 'Inclusive Sans', sans-serif;
+      }
+
       /* --- BOTTOM UI (CC & AUDIO) --- */
       #ui-container {
         position: absolute;
@@ -25,25 +34,19 @@
       /* --- TOP RIGHT UI (FONT CONTROLS) --- */
       #font-controls {
         position: absolute;
-        
-        /* VERTICAL ALIGNMENT FIX: */
-        /* Match the Top and Height of the Caption Box exactly */
         top: 20px;
-        height: 150px;
-        
+        height: 150px; /* Match caption box height */
         right: 15px;
         
-        /* Use Flexbox to center the buttons vertically within this 150px height */
-        display: none; /* Hidden by default */
+        display: none; 
         flex-direction: column; 
-        justify-content: center; /* Centers vertically */
+        justify-content: center; 
         gap: 10px;
         
         z-index: 1001;
-        pointer-events: none; /* Allows clicks to pass through the empty space around buttons */
+        pointer-events: none; 
       }
       
-      /* Re-enable clicks on the buttons themselves */
       #font-controls button {
         pointer-events: auto;
       }
@@ -89,10 +92,8 @@
       #caption-container {
         position: absolute;
         top: 20px; 
-        
-        /* Anchor Left & Right */
         left: 20px; 
-        right: 85px; /* Stop 85px from right to avoid overlap */
+        right: 85px; 
         
         height: 150px; 
         background-color: rgba(0, 0, 0, 0.85);
@@ -106,10 +107,13 @@
       #caption-content {
         padding: 20px;
         color: #FFFFFF; 
-        font-family: Arial, sans-serif;
+        
+        /* Explicitly set Accessible Font here too */
+        font-family: 'Inclusive Sans', sans-serif;
+        
         font-size: 1.4rem; 
-        line-height: 1.4;
-        font-weight: bold;
+        line-height: 1.5; /* Slightly increased for better readability */
+        font-weight: 400; /* Inclusive Sans is naturally legible, bold (700) might be too thick */
         text-align: left;
         position: relative;
         top: 0;
@@ -119,9 +123,10 @@
         position: absolute;
         bottom: 5px;
         right: 10px;
-        font-size: 10px;
-        color: #aaa;
+        font-size: 12px; /* Increased slightly for legibility */
+        color: #ccc;     /* Increased contrast slightly */
         pointer-events: none;
+        font-family: 'Inclusive Sans', sans-serif;
       }
     </style>
   </head>
@@ -171,36 +176,29 @@
     </a-scene>
 
     <script>
-      // Elements
       const btnCaptions = document.getElementById('btn-captions');
       const btnAudio = document.getElementById('btn-audio');
-      
       const fontControls = document.getElementById('font-controls');
       const btnFontUp = document.getElementById('btn-font-up');
       const btnFontDown = document.getElementById('btn-font-down');
-
       const captionContainer = document.getElementById('caption-container');
       const captionContent = document.getElementById('caption-content');
       const audioEl = document.getElementById('audio-desc');
       
-      // Settings
       let scrollSpeed = 0.25; 
       let currentFontSize = 1.4; 
-
       let scrollInterval;
       let currentTop = 0;
       let isPaused = false;
       let touchStartY = 0;
       let isTouching = false;
 
-      // --- HELPER: RESET & SYNC ---
       function resetSync() {
         audioEl.currentTime = 0;
         currentTop = 0;
         captionContent.style.top = '0px';
       }
       
-      // --- FONT SIZE LOGIC ---
       function updateFontSize() {
         captionContent.style.fontSize = currentFontSize + 'rem';
       }
@@ -219,7 +217,6 @@
         }
       });
 
-      // --- 1. CAPTION BUTTON LOGIC ---
       btnCaptions.addEventListener('click', () => {
         btnCaptions.classList.toggle('active');
         
@@ -229,7 +226,7 @@
           fontControls.style.display = 'none';
         } else {
           captionContainer.style.display = 'block';
-          fontControls.style.display = 'flex'; // This activates the Flexbox centering
+          fontControls.style.display = 'flex'; 
           
           if (btnAudio.classList.contains('active')) {
             resetSync();
@@ -239,10 +236,8 @@
         }
       });
 
-      // --- 2. AUDIO BUTTON LOGIC ---
       btnAudio.addEventListener('click', () => {
         btnAudio.classList.toggle('active');
-        
         if (audioEl.paused) {
           if (btnCaptions.classList.contains('active')) {
             resetSync();
@@ -253,18 +248,14 @@
         }
       });
 
-      // --- SCROLLING ANIMATION ---
       function startScrolling() {
         if (scrollInterval) cancelAnimationFrame(scrollInterval);
-        
         function animate() {
           if (!isPaused && captionContainer.style.display === 'block') {
             currentTop -= scrollSpeed;
-            
             const maxScroll = -(captionContent.clientHeight - captionContainer.clientHeight);
             if (currentTop < maxScroll) currentTop = maxScroll; 
             if (currentTop > 0) currentTop = 0;
-
             captionContent.style.top = currentTop + 'px';
           }
           scrollInterval = requestAnimationFrame(animate);
@@ -276,7 +267,6 @@
         cancelAnimationFrame(scrollInterval);
       }
 
-      // --- TOUCH INTERACTIONS ---
       captionContainer.addEventListener('touchstart', (e) => {
         isPaused = true; 
         touchStartY = e.touches[0].clientY;
@@ -291,16 +281,12 @@
       captionContainer.addEventListener('touchmove', (e) => {
         if (!isTouching) return;
         e.preventDefault(); 
-        
         const touchCurrentY = e.touches[0].clientY;
         const diffY = touchCurrentY - touchStartY;
-
         const sensitivity = 2.0; 
         currentTop += (diffY * 0.05) * sensitivity;
-
         captionContent.style.top = currentTop + 'px';
       });
-
     </script>
   </body>
 </html>
